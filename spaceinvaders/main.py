@@ -1,4 +1,5 @@
 import pygame
+from pygame import mixer
 from random import randint
 
 
@@ -21,6 +22,7 @@ def player(x, y):
 def enemy(x, y):
     screen.blit(enemyImage, (x, y))
 
+
 # Initialize the pygame
 pygame.init()
 
@@ -33,6 +35,8 @@ pygame.display.set_caption(" Space Invader")
 icon = pygame.image.load("spaceship.png")
 pygame.display.set_icon(icon)
 background = pygame.image.load("background.png")
+mixer.music.load("background.wav")
+mixer.music.play(-1)
 
 # Load player image
 playerImage = pygame.image.load("player.png")
