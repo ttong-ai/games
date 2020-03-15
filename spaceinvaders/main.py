@@ -15,12 +15,119 @@ class Score:
         screen.blit(score, (x, y))
 
 
-def player(x, y):
-    screen.blit(playerImage, (x, y))
+class Entity:
+    def __init__(
+            self,
+            image_name,
+            init_x,
+            init_y,
+            speed,
+            boost,
+            dx=0,
+            dy=0,
+            icon_x_offset=0,
+            icon_y_offset=0
+    ):
+        self.image =pygame.image.load(image_name)
+        self.x = init_x
+        self.y = init_y
+        self.dx = dx
+        self.dy = dy
+        self.icon_x_offset = icon_x_offset
+        self.icon_y_offset = icon_y_offset
+        self.speed = speed
+        self.boost = boost
+
+    def __call__(self):
+        screen.blit(self.image, (self.x, self.y))
+
+    def move_x(self):
+        self.x += self.dx
+        if self.x < 0:
+            self.x = 0
+        elif self.x > windowWidth - self.icon_x_offset:
+            self.x = windowWidth - self.icon_x_offset
+
+    def move_y(self):
+        self.y += self.dy
+        if self.y < 0:
+            self.y = 0
+        elif self.y > windowHeight - self.icon_y_offset:
+            self.y = windowHeight - self.icon_y_offset
+
+    def update_dx(self, direction, boost=None):
+        boost = boost if boost else self.boost
+        self.dx = direction * self.speed * boost
+
+    def update_dy(self, direction, boost=None):
+        boost = boost if boost else self.boost
+        self.dy = direction * self.speed * boost
+
+    def stop_x(self):
+        self.dx = 0
+
+    def stop_y(self):
+        self.dy = 0
+
+    def stop(self):
+        self.stop_x()
+        self.stop_y()
 
 
-def enemy(x, y):
-    screen.blit(enemyImage, (x, y))
+class Spaceship(Entity):
+    def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0):
+        super(Spaceship, self).__init__(
+            "player.png",
+            init_x,
+            init_y,
+            speed,
+            boost,
+            dx,
+            dy,
+            icon_x_offset=60,
+            icon_y_offset=65
+        )
+
+
+class Enemy(Entity):
+    def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0):
+        super(Enemy, self).__init__(
+            "virus.png",
+            init_x,
+            init_y,
+            speed,
+            boost,
+            dx,
+            dy,
+            icon_x_offset=60,
+            icon_y_offset=60,
+        )
+
+    def move(self):
+        self.x += self.dx
+        if self.x < 0:
+            self.x = 0
+            self.dx = self.dx * -1
+            self.y += self.speed * self.boost
+        elif self.x > windowWidth - self.icon_x_offset:
+            self.x = windowWidth - self.icon_x_offset
+            self.dx = self.dx * -1
+            self.y += self.speed * self.boost
+
+
+class Bullet(Entity):
+    def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0):
+        super(Bullet, self).__init__(
+            "bullet1.png",
+            init_x,
+            init_y,
+            speed,
+            boost,
+            dx,
+            dy,
+            icon_x_offset=60,
+            icon_y_offset=60,
+        )
 
 
 # Initialize the pygame
@@ -38,22 +145,12 @@ background = pygame.image.load("background.png")
 mixer.music.load("background.wav")
 mixer.music.play(-1)
 
-# Load player image
-playerImage = pygame.image.load("player.png")
-playerX = 370
-playerY = 480
-dPlayerX, dPlayerY = 0, 0
-speedPlayer = 10
-boostPlayer = 2
-
-# Load enemy image
-enemyImage = pygame.image.load("virus.png")
-enemyX = randint(0, windowWidth - 60)
-enemyY = randint(0, windowHeight / 2)
-dEnemyX, dEnemyY = 0, 0
-speedEnemy = 8
-boostEnemy = 1
-
+player = Spaceship(init_x=450, init_y=900, speed=10, boost=2)
+enemies = [
+    Enemy(init_x=randint(0, windowWidth - 60), init_y=randint(0, windowHeight / 2), speed=20, dx=randint(-30, 30))
+    for _ in range(0, 10)
+]
+bullets = []
 score = Score()
 
 # Game Loop
@@ -68,32 +165,27 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                dPlayerX -= speedPlayer * boostPlayer
+                player.update_dx(direction=-1)
             elif event.key == pygame.K_RIGHT:
-                dPlayerX += speedPlayer * boostPlayer
+                player.update_dx(direction=1)
             elif event.key == pygame.K_UP:
-                dPlayerY -= speedPlayer * boostPlayer
+                player.update_dy(direction=-1)
             elif event.key == pygame.K_DOWN:
-                dPlayerY += speedPlayer * boostPlayer
+                player.update_dy(direction=1)
+            elif event.key == pygame.K_SPACE:
+                bullets.append(Bullet)
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                dPlayerX = 0
+                player.stop_x()
             elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                dPlayerY = 0
+                player.stop_y()
 
-    playerX += dPlayerX
-    if playerX < 0:
-        playerX = 0
-    elif playerX > windowWidth - 60:
-        playerX = windowWidth - 60
-
-    playerY += dPlayerY
-    if playerY < 0:
-        playerY = 0
-    elif playerY > windowHeight - 65:
-        playerY = windowHeight - 65
-    # print(playerX, playerY)
-    player(playerX, playerY)
-    enemy(enemyX, enemyY)
+    player.move_x()
+    player.move_y()
+    print(player.x, player.y)
+    player()
+    for enemy in enemies:
+        enemy.move()
+        enemy()
     score(screen=screen, x=100, y=20)
     pygame.display.update()
