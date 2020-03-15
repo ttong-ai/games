@@ -2,6 +2,18 @@ import pygame
 from random import randint
 
 
+class Score:
+    def __init__(self):
+        self.score_value = 0
+        self.font = pygame.font.Font("freesansbold.ttf", 32)
+        self.textX = 10
+        self.textY = 10
+
+    def __call__(self, screen, x, y):
+        score = self.font.render("Score : " + str(self.score_value), True, (255, 255, 255))
+        screen.blit(score, (x, y))
+
+
 def player(x, y):
     screen.blit(playerImage, (x, y))
 
@@ -13,20 +25,21 @@ def enemy(x, y):
 pygame.init()
 
 # Initialize a screen for our game
-windowWidth, windowHeight = 800, 600
+windowWidth, windowHeight = 1024, 1024
 screen = pygame.display.set_mode((windowWidth, windowHeight))
 
 # Set the title and caption
 pygame.display.set_caption(" Space Invader")
 icon = pygame.image.load("spaceship.png")
 pygame.display.set_icon(icon)
+background = pygame.image.load("background.png")
 
 # Load player image
 playerImage = pygame.image.load("player.png")
 playerX = 370
 playerY = 480
 dPlayerX, dPlayerY = 0, 0
-speedPlayer = 5
+speedPlayer = 10
 boostPlayer = 2
 
 # Load enemy image
@@ -34,15 +47,18 @@ enemyImage = pygame.image.load("virus.png")
 enemyX = randint(0, windowWidth - 60)
 enemyY = randint(0, windowHeight / 2)
 dEnemyX, dEnemyY = 0, 0
-speedEnemy = 5
+speedEnemy = 8
 boostEnemy = 1
 
+score = Score()
 
 # Game Loop
 running = True
 while running:
     # Fill the screen with RGB - (Red, Green, Blue)
-    screen.fill((0, 0, 128))
+    # screen.fill((0, 0, 128))
+    screen.blit(background, (0, 0))
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -75,4 +91,5 @@ while running:
     # print(playerX, playerY)
     player(playerX, playerY)
     enemy(enemyX, enemyY)
+    score(screen=screen, x=100, y=20)
     pygame.display.update()
