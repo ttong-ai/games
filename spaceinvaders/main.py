@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from math import sqrt
 import pygame
 from pygame import mixer
@@ -6,7 +7,7 @@ from typing import List
 
 
 def show_big_text(text, x, y):
-    label = pygame.font.Font("freesansbold.ttf", 64).render(text, True, (255, 255, 255))
+    label = pygame.font.Font("freesansbold.ttf", 76).render(text, True, (255, 255, 255))
     screen.blit(label, (x, y))
 
 
@@ -22,7 +23,7 @@ class Score:
         screen.blit(score, (x, y))
 
 
-class Entity:
+class Entity(ABC):
     def __init__(
             self,
             image_name,
@@ -35,7 +36,7 @@ class Entity:
             icon_x_offset=0,
             icon_y_offset=0
     ):
-        self.image =pygame.image.load(image_name)
+        self.image = pygame.image.load(image_name)
         self.image_size = self.image.get_rect().size
         self.center_offset_x = self.image_size[0] // 2
         self.center_offset_y = self.image_size[1] // 2
@@ -51,6 +52,9 @@ class Entity:
 
     def __call__(self):
         screen.blit(self.image, (self.x, self.y))
+
+    def update(self):
+        self.__call__()
 
     def move_x(self):
         self.x += self.dx
@@ -152,11 +156,14 @@ class Bullet(Entity):
         if self.y <= 0:
             self.status = 0
 
-    def hit_enemy(self, enemies: List[Enemy]):
-        for enemy in enemies:
-            if self.distance(enemy) < sqrt(enemy.center_offset_x**2 + enemy.center_offset_y**2) * self.range:
-                enemy.gets_killed()
+    def hit_trigger(self, enemies: List[Enemy]):
+        for e in enemies:
+            if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2):
+                e.gets_killed()
                 self.status = 0
+
+    def detonate(self):
+        pass
 
 
 class RegularBullet(Bullet):
@@ -194,6 +201,18 @@ class UltraBullet(Bullet):
         )
 
 
+class SuperBomb(Bullet):
+    def __init__(self, init_x, init_y):
+        super(SuperBomb, self).__init__(
+            image="bomb2.png",
+            init_x=init_x,
+            init_y=init_y,
+            speed=30,
+            dy=-30,
+            range=4,
+        )
+
+
 # Initialize the pygame
 pygame.init()
 
@@ -212,7 +231,7 @@ mixer.music.play(-1)
 player = Spaceship(init_x=windowWidth / 2, init_y=windowHeight - 100, speed=10, boost=2)
 enemies = [
     Enemy(init_x=randint(0, windowWidth - 60), init_y=randint(0, windowHeight / 2), speed=20, dx=randint(20, 40))
-    for _ in range(0, 100)
+    for _ in range(0, 111)
 ]
 bullets = []
 score = Score()
@@ -237,11 +256,21 @@ while running:
             elif event.key == pygame.K_DOWN:
                 player.update_dy(direction=1)
             elif event.key == pygame.K_c:
-                bullets.append(RegularBullet(player.x + player.center_offset_x - 10, player.y + player.center_offset_y))
+                bullets.append(
+                    RegularBullet(player.x + player.center_offset_x - 12, player.y + player.center_offset_y)
+                )
             elif event.key == pygame.K_x:
-                bullets.append(SuperBullet(player.x + player.center_offset_x - 10, player.y + player.center_offset_y))
+                bullets.append(
+                    SuperBullet(player.x + player.center_offset_x - 12, player.y + player.center_offset_y + 35)
+                )
             elif event.key == pygame.K_z:
-                bullets.append(UltraBullet(player.x + player.center_offset_x - 10, player.y + player.center_offset_y))
+                bullets.append(
+                    UltraBullet(player.x + player.center_offset_x - 12, player.y + player.center_offset_y + 80)
+                )
+            elif event.key == pygame.K_SPACE:
+                bullets.append(
+                    SuperBomb(player.x + player.center_offset_x - 16, player.y + player.center_offset_y - 30)
+                )
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
@@ -255,7 +284,7 @@ while running:
     player()
     for bullet in bullets:
         bullet.move()
-        bullet.hit_enemy(enemies)
+        bullet.hit_trigger(enemies)
         if bullet.status == 1:
             bullet()
         elif bullet.status == 0:
