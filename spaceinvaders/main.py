@@ -102,21 +102,6 @@ class Entity(ABC):
         return sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
 
 
-class Spaceship(Entity):
-    def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0):
-        super(Spaceship, self).__init__(
-            "player.png",
-            init_x,
-            init_y,
-            speed,
-            boost,
-            dx,
-            dy,
-            icon_x_offset=60,
-            icon_y_offset=65
-        )
-
-
 class Enemy(Entity):
     def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0, value=10):
         super(Enemy, self).__init__(
@@ -147,6 +132,32 @@ class Enemy(Entity):
         self.explode()
         Score.increase(self.value)
         self.status = 0
+
+    def explode(self):
+        self.image = pygame.image.load("flame.png")
+        screen.blit(self.image, (self.x, self.y))
+
+
+class Spaceship(Entity):
+    def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0):
+        super(Spaceship, self).__init__(
+            "player.png",
+            init_x,
+            init_y,
+            speed,
+            boost,
+            dx,
+            dy,
+            icon_x_offset=60,
+            icon_y_offset=65
+        )
+
+    def got_hit(self, enemies: List[Enemy]):
+        for e in enemies:
+            if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2):
+                self.status = 0
+                self.explode()
+                break
 
     def explode(self):
         self.image = pygame.image.load("flame.png")
@@ -263,6 +274,7 @@ bullets = []
 
 # Game Loop
 running = True
+active = True
 while running:
     # Fill the screen with RGB - (Red, Green, Blue)
     # screen.fill((0, 0, 128))
@@ -271,7 +283,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN:
+        if active and event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 player.update_dx(direction=-1)
             elif event.key == pygame.K_RIGHT:
@@ -316,7 +328,7 @@ while running:
         if enemy.status == 1:
             enemy.move()
             enemy()
-
+    player.got_hit(enemies)
     Score.show(screen=screen, x=100, y=20)
 
     for bullet in bullets:
@@ -330,4 +342,8 @@ while running:
 
     if len(enemies) == 0:
         show_big_text("You Won!!!", x=windowWidth/2-200, y=windowHeight/2)
+        active = False
+    elif player.status == 0:
+        show_big_text("You Lost!!!", x=windowWidth/2-200, y=windowHeight/2)
+        active = False
     pygame.display.update()
