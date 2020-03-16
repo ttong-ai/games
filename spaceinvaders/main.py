@@ -294,7 +294,7 @@ while running:
                 )
             elif event.key == pygame.K_SPACE:
                 bullets.append(
-                    SuperBomb(player.x + player.center_offset_x - 16, player.y + player.center_offset_y - 30)
+                    SuperBomb(player.x + player.center_offset_x - 32, player.y + player.center_offset_y - 64)
                 )
 
         if event.type == pygame.KEYUP:
