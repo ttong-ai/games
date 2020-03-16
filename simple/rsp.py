@@ -6,12 +6,12 @@ your_score = 0
 for i in range(0, 6):
     t = input("Give me your hand [R]ock, [P]aper, [S]cissors: ")
     t = t.lower().strip()
-    if t == 'r':
+    if t == "r":
         t = "rock"
-    elif t == 'p':
-        t = 'paper'
-    elif t == 's':
-        t = 'scissors'
+    elif t == "p":
+        t = "paper"
+    elif t == "s":
+        t = "scissors"
     if t not in ["rock", "scissors", "paper"]:
         print(f"Input '{t}' is not allowed.\n")
         continue

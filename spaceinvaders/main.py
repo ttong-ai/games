@@ -34,18 +34,7 @@ class Score:
 
 
 class Entity(ABC):
-    def __init__(
-            self,
-            image_name,
-            init_x,
-            init_y,
-            speed,
-            boost,
-            dx=0,
-            dy=0,
-            icon_x_offset=0,
-            icon_y_offset=0
-    ):
+    def __init__(self, image_name, init_x, init_y, speed, boost, dx=0, dy=0, icon_x_offset=0, icon_y_offset=0):
         self.image = pygame.image.load(image_name)
         self.image_size = self.image.get_rect().size
         self.center_offset_x = self.image_size[0] // 2
@@ -99,21 +88,13 @@ class Entity(ABC):
         self.stop_y()
 
     def distance(self, other):
-        return sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
+        return sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
 
 
 class Enemy(Entity):
     def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0, value=10):
         super(Enemy, self).__init__(
-            "virus.png",
-            init_x,
-            init_y,
-            speed,
-            boost,
-            dx,
-            dy,
-            icon_x_offset=60,
-            icon_y_offset=60,
+            "virus.png", init_x, init_y, speed, boost, dx, dy, icon_x_offset=60, icon_y_offset=60
         )
         self.value = value
 
@@ -141,20 +122,12 @@ class Enemy(Entity):
 class Spaceship(Entity):
     def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0):
         super(Spaceship, self).__init__(
-            "player.png",
-            init_x,
-            init_y,
-            speed,
-            boost,
-            dx,
-            dy,
-            icon_x_offset=60,
-            icon_y_offset=65
+            "player.png", init_x, init_y, speed, boost, dx, dy, icon_x_offset=60, icon_y_offset=65
         )
 
     def got_hit(self, enemies: List[Enemy]):
         for e in enemies:
-            if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2):
+            if self.distance(e) < sqrt(e.center_offset_x ** 2 + e.center_offset_y ** 2):
                 self.status = 0
                 self.explode()
                 break
@@ -166,17 +139,7 @@ class Spaceship(Entity):
 
 class Bullet(Entity):
     def __init__(self, image, init_x, init_y, speed, boost=1, dx=0, dy=0, range=1):
-        super(Bullet, self).__init__(
-            image,
-            init_x,
-            init_y,
-            speed,
-            boost,
-            dx,
-            dy,
-            icon_x_offset=12,
-            icon_y_offset=12,
-        )
+        super(Bullet, self).__init__(image, init_x, init_y, speed, boost, dx, dy, icon_x_offset=12, icon_y_offset=12)
         self.range = range
 
     def move(self):
@@ -186,7 +149,7 @@ class Bullet(Entity):
 
     def hit_trigger(self, enemies: List[Enemy]):
         for e in enemies:
-            if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2):
+            if self.distance(e) < sqrt(e.center_offset_x ** 2 + e.center_offset_y ** 2):
                 self.status = 0
                 self.detonate(enemies)
                 break
@@ -202,55 +165,32 @@ class Bullet(Entity):
 
 class RegularBullet(Bullet):
     def __init__(self, init_x, init_y):
-        super(RegularBullet, self).__init__(
-            image="bullet1.png",
-            init_x=init_x,
-            init_y=init_y,
-            speed=50,
-            dy=-50
-        )
+        super(RegularBullet, self).__init__(image="bullet1.png", init_x=init_x, init_y=init_y, speed=50, dy=-50)
 
 
 class SuperBullet(Bullet):
     def __init__(self, init_x, init_y):
         super(SuperBullet, self).__init__(
-            image="bullet2.png",
-            init_x=init_x,
-            init_y=init_y,
-            speed=100,
-            dy=-100,
-            range=2,
+            image="bullet2.png", init_x=init_x, init_y=init_y, speed=100, dy=-100, range=2
         )
 
 
 class UltraBullet(Bullet):
     def __init__(self, init_x, init_y):
         super(UltraBullet, self).__init__(
-            image="bullet3.png",
-            init_x=init_x,
-            init_y=init_y,
-            speed=150,
-            dy=-150,
-            range=3,
+            image="bullet3.png", init_x=init_x, init_y=init_y, speed=150, dy=-150, range=3
         )
 
 
 class SuperBomb(Bullet):
     def __init__(self, init_x, init_y):
-        super(SuperBomb, self).__init__(
-            image="bomb.png",
-            init_x=init_x,
-            init_y=init_y,
-            speed=30,
-            dy=-30,
-            range=4,
-        )
+        super(SuperBomb, self).__init__(image="bomb.png", init_x=init_x, init_y=init_y, speed=30, dy=-30, range=4)
 
     def detonate(self, enemies: List[Enemy]):
         super(SuperBomb, self).detonate(enemies)
         self.image = pygame.image.load("explosion.png")
         size = self.image.get_rect().size
-        screen.blit(self.image, (self.x - size[0]//2, self.y - size[1]//2))
+        screen.blit(self.image, (self.x - size[0] // 2, self.y - size[1] // 2))
 
 
 # Initialize a screen for our game
@@ -293,9 +233,7 @@ while running:
             elif event.key == pygame.K_DOWN:
                 player.update_dy(direction=1)
             elif event.key == pygame.K_c:
-                bullets.append(
-                    RegularBullet(player.x + player.center_offset_x - 12, player.y + player.center_offset_y)
-                )
+                bullets.append(RegularBullet(player.x + player.center_offset_x - 12, player.y + player.center_offset_y))
             elif event.key == pygame.K_x:
                 bullets.append(
                     SuperBullet(player.x + player.center_offset_x - 12, player.y + player.center_offset_y + 35)
@@ -341,9 +279,9 @@ while running:
             del enemy
 
     if len(enemies) == 0:
-        show_big_text("You Won!!!", x=windowWidth/2-200, y=windowHeight/2)
+        show_big_text("You Won!!!", x=windowWidth / 2 - 200, y=windowHeight / 2)
         active = False
     elif player.status == 0:
-        show_big_text("You Lost!!!", x=windowWidth/2-200, y=windowHeight/2)
+        show_big_text("You Lost!!!", x=windowWidth / 2 - 200, y=windowHeight / 2)
         active = False
     pygame.display.update()
