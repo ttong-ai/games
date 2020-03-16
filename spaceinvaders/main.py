@@ -6,21 +6,31 @@ from random import randint
 from typing import List
 
 
+# Initialize the pygame instance
+pygame.init()
+
+
 def show_big_text(text, x, y):
     label = pygame.font.Font("freesansbold.ttf", 76).render(text, True, (255, 255, 255))
     screen.blit(label, (x, y))
 
 
 class Score:
-    def __init__(self):
-        self.score_value = 0
-        self.font = pygame.font.Font("freesansbold.ttf", 32)
-        self.textX = 10
-        self.textY = 10
+    score_value = 0
+    font = pygame.font.Font("freesansbold.ttf", 32)
 
-    def __call__(self, screen, x, y):
-        score = self.font.render("Score : " + str(self.score_value), True, (255, 255, 255))
+    @classmethod
+    def show(cls, screen, x, y):
+        score = cls.font.render("Score : " + str(cls.score_value), True, (255, 255, 255))
         screen.blit(score, (x, y))
+
+    @classmethod
+    def increase(cls, val):
+        cls.score_value += val
+
+    @classmethod
+    def decrease(cls, val):
+        cls.score_value -= val
 
 
 class Entity(ABC):
@@ -108,7 +118,7 @@ class Spaceship(Entity):
 
 
 class Enemy(Entity):
-    def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0):
+    def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0, value=10):
         super(Enemy, self).__init__(
             "virus.png",
             init_x,
@@ -120,6 +130,7 @@ class Enemy(Entity):
             icon_x_offset=60,
             icon_y_offset=60,
         )
+        self.value = value
 
     def move(self):
         self.x += self.dx
@@ -133,7 +144,13 @@ class Enemy(Entity):
             self.y += self.speed * self.boost
 
     def gets_killed(self):
+        self.explode()
+        Score.increase(self.value)
         self.status = 0
+
+    def explode(self):
+        self.image = pygame.image.load("flame.png")
+        screen.blit(self.image, (self.x, self.y))
 
 
 class Bullet(Entity):
@@ -159,11 +176,17 @@ class Bullet(Entity):
     def hit_trigger(self, enemies: List[Enemy]):
         for e in enemies:
             if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2):
-                e.gets_killed()
                 self.status = 0
+                self.detonate(enemies)
+                break
 
-    def detonate(self):
+    def timed_trigger(self):
         pass
+
+    def detonate(self, enemies: List[Enemy]):
+        for e in enemies:
+            if self.distance(e) < sqrt(e.center_offset_x ** 2 + e.center_offset_y ** 2) * self.range:
+                e.gets_killed()
 
 
 class RegularBullet(Bullet):
@@ -204,7 +227,7 @@ class UltraBullet(Bullet):
 class SuperBomb(Bullet):
     def __init__(self, init_x, init_y):
         super(SuperBomb, self).__init__(
-            image="bomb2.png",
+            image="bomb.png",
             init_x=init_x,
             init_y=init_y,
             speed=30,
@@ -212,9 +235,12 @@ class SuperBomb(Bullet):
             range=4,
         )
 
+    def detonate(self, enemies: List[Enemy]):
+        super(SuperBomb, self).detonate(enemies)
+        self.image = pygame.image.load("explosion.png")
+        size = self.image.get_rect().size
+        screen.blit(self.image, (self.x - size[0]//2, self.y - size[1]//2))
 
-# Initialize the pygame
-pygame.init()
 
 # Initialize a screen for our game
 windowWidth, windowHeight = 1024, 1024
@@ -234,7 +260,6 @@ enemies = [
     for _ in range(0, 111)
 ]
 bullets = []
-score = Score()
 
 # Game Loop
 running = True
@@ -287,17 +312,22 @@ while running:
         bullet.hit_trigger(enemies)
         if bullet.status == 1:
             bullet()
-        elif bullet.status == 0:
-            bullets.remove(bullet)
-            del bullet
     for enemy in enemies:
         if enemy.status == 1:
             enemy.move()
             enemy()
-        elif enemy.status == 0: 
+
+    Score.show(screen=screen, x=100, y=20)
+
+    for bullet in bullets:
+        if bullet.status == 0:
+            bullets.remove(bullet)
+            del bullet
+    for enemy in enemies:
+        if enemy.status == 0:
             enemies.remove(enemy)
             del enemy
-    score(screen=screen, x=100, y=20)
+
     if len(enemies) == 0:
         show_big_text("You Won!!!", x=windowWidth/2-200, y=windowHeight/2)
     pygame.display.update()
