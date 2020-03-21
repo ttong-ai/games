@@ -34,7 +34,9 @@ class Score:
 
 
 class Entity(ABC):
-    def __init__(self, image_name, init_x, init_y, speed, boost, dx=0, dy=0, icon_x_offset=0, icon_y_offset=0):
+    def __init__(
+        self, image_name, init_x, init_y, speed, boost, dx=0, dy=0, icon_x_offset=0, icon_y_offset=0
+    ):
         self.image = pygame.image.load(image_name)
         self.image_size = self.image.get_rect().size
         self.center_offset_x = self.image_size[0] // 2
@@ -139,7 +141,9 @@ class Spaceship(Entity):
 
 class Bullet(Entity):
     def __init__(self, image, init_x, init_y, speed, boost=1, dx=0, dy=0, range=1):
-        super(Bullet, self).__init__(image, init_x, init_y, speed, boost, dx, dy, icon_x_offset=12, icon_y_offset=12)
+        super(Bullet, self).__init__(
+            image, init_x, init_y, speed, boost, dx, dy, icon_x_offset=12, icon_y_offset=12
+        )
         self.range = range
 
     def move(self):
@@ -165,7 +169,9 @@ class Bullet(Entity):
 
 class RegularBullet(Bullet):
     def __init__(self, init_x, init_y):
-        super(RegularBullet, self).__init__(image="bullet1.png", init_x=init_x, init_y=init_y, speed=50, dy=-50)
+        super(RegularBullet, self).__init__(
+            image="bullet1.png", init_x=init_x, init_y=init_y, speed=50, dy=-50
+        )
 
 
 class SuperBullet(Bullet):
@@ -184,7 +190,9 @@ class UltraBullet(Bullet):
 
 class SuperBomb(Bullet):
     def __init__(self, init_x, init_y):
-        super(SuperBomb, self).__init__(image="bomb.png", init_x=init_x, init_y=init_y, speed=30, dy=-30, range=4)
+        super(SuperBomb, self).__init__(
+            image="bomb.png", init_x=init_x, init_y=init_y, speed=30, dy=-30, range=4
+        )
 
     def detonate(self, enemies: List[Enemy]):
         super(SuperBomb, self).detonate(enemies)
@@ -207,7 +215,9 @@ mixer.music.play(-1)
 
 player = Spaceship(init_x=windowWidth / 2, init_y=windowHeight - 100, speed=10, boost=2)
 enemies = [
-    Enemy(init_x=randint(0, windowWidth - 60), init_y=randint(0, windowHeight / 2), speed=20, dx=randint(20, 40))
+    Enemy(
+        init_x=randint(0, windowWidth - 60), init_y=randint(0, windowHeight / 2), speed=20, dx=randint(20, 40)
+    )
     for _ in range(0, 111)
 ]
 bullets = []
@@ -233,14 +243,20 @@ while running:
             elif event.key == pygame.K_DOWN:
                 player.update_dy(direction=1)
             elif event.key == pygame.K_c:
-                bullets.append(RegularBullet(player.x + player.center_offset_x - 12, player.y + player.center_offset_y))
+                bullets.append(
+                    RegularBullet(player.x + player.center_offset_x - 12, player.y + player.center_offset_y)
+                )
             elif event.key == pygame.K_x:
                 bullets.append(
-                    SuperBullet(player.x + player.center_offset_x - 12, player.y + player.center_offset_y + 35)
+                    SuperBullet(
+                        player.x + player.center_offset_x - 12, player.y + player.center_offset_y + 35
+                    )
                 )
             elif event.key == pygame.K_z:
                 bullets.append(
-                    UltraBullet(player.x + player.center_offset_x - 12, player.y + player.center_offset_y + 80)
+                    UltraBullet(
+                        player.x + player.center_offset_x - 12, player.y + player.center_offset_y + 80
+                    )
                 )
             elif event.key == pygame.K_SPACE:
                 bullets.append(
