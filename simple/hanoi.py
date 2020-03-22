@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+This is a beautiful little program that uses Turtle objects as
+the Hanoi discs.
+"""
 from turtle import *
 
 
@@ -38,25 +42,26 @@ def hanoi(n, from_, with_, to_):
 
 
 def play():
+    global t1, t2, t3, n
     onkey(None, "space")
     clear()
     try:
-        hanoi(6, t1, t2, t3)
+        hanoi(n, t1, t2, t3)
         write("press STOP button to exit", align="center", font=("Courier", 16, "bold"))
     except Terminator:
         pass  # turtledemo user pressed STOP
 
 
 def main():
-    global t1, t2, t3
+    global t1, t2, t3, n
     ht()
     penup()
     goto(0, -225)  # writer turtle
     t1 = Tower(-250)
     t2 = Tower(0)
     t3 = Tower(250)
-    # make tower of 6 discs
-    for i in range(6, 0, -1):
+    # make tower of n discs
+    for i in range(n, 0, -1):
         t1.push(Disc(i))
     # prepare spartanic user interface ;-)
     write("press spacebar to start game", align="center", font=("Courier", 16, "bold"))
@@ -66,6 +71,7 @@ def main():
 
 
 if __name__ == "__main__":
+    n = 3
     msg = main()
     print(msg)
     mainloop()
