@@ -1,7 +1,7 @@
 from turtle import *
 
 
-def fill(c="black", f="white"):
+def penfill(c="black", f="white"):
     import turtle as t
 
     def real_decorator(function):
@@ -26,6 +26,7 @@ def supergon(n, edge, dir=0):
         left(360 / n)
 
 
+screensize(500, 500)
 bgcolor("yellow")
 width(5)
 speed(10)
@@ -33,26 +34,26 @@ speed(10)
 up()
 goto(-200, 100)
 down()
-fill("orange", "white")(circle)(120)
+penfill("orange", "white")(circle)(120)
 up()
 goto(-220, 125)
 down()
-fill("cyan", "black")(circle)(60)
+penfill("black", "black")(circle)(60)
 
 
 up()
 goto(200, 100)
 down()
-fill("orange", "white")(circle)(120)
+penfill("orange", "white")(circle)(120)
 up()
 goto(180, 125)
 down()
-fill("cyan", "black")(circle)(60)
+penfill("black", "black")(circle)(60)
 
 up()
 goto(-50, -100)
 down()
-fill("blue", "black")(supergon)(n=3, edge=100)
+penfill("blue", "black")(supergon)(n=3, edge=100)
 
 up()
 goto(-200, -200)
@@ -61,10 +62,11 @@ down()
 forward(400)
 
 up()
-goto(-400, -20)
-fill("blue", "black")(supergon)(n=3, edge=100)
+goto(-450, -30)
+penfill("blue", "orange")(supergon)(n=3, edge=100)
 up()
-goto(400, -20)
-fill("blue", "black")(supergon)(n=3, edge=100)
+goto(350, -30)
+penfill("blue", "orange")(supergon)(n=3, edge=100)
+
 
 exitonclick()
