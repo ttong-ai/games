@@ -1,3 +1,4 @@
+from time import time
 from turtle import *
 
 
