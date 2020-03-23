@@ -19,6 +19,10 @@ def penfill(c="black", f="white"):
     return real_decorator
 
 
+class Eye(Turtle):
+    pass
+
+
 def supergon(n, edge, dir=0):
     seth(dir)
     for i in range(n):
@@ -26,40 +30,57 @@ def supergon(n, edge, dir=0):
         left(360 / n)
 
 
-screensize(500, 500)
+screensize(500, 700)
 bgcolor("yellow")
 width(5)
 speed(10)
 
+# Left eye
 up()
-goto(-200, 100)
+goto(-200, 50)
 down()
 penfill("orange", "white")(circle)(120)
 up()
 goto(-220, 125)
 down()
-penfill("black", "black")(circle)(60)
+penfill("blue", "black")(circle)(60)
 
-
+# Right eye
 up()
-goto(200, 100)
+goto(200, 50)
 down()
 penfill("orange", "white")(circle)(120)
 up()
 goto(180, 125)
 down()
-penfill("black", "black")(circle)(60)
+penfill("blue", "black")(circle)(60)
 
 up()
 goto(-50, -100)
 down()
-penfill("blue", "black")(supergon)(n=3, edge=100)
+penfill("blue", "red")(supergon)(n=3, edge=100)
 
 up()
-goto(-200, -200)
+goto(-250, -200)
 seth(0)
 down()
-forward(400)
+color("purple", "red")
+begin_fill()
+forward(500)
+right(150)
+circle(-500, 60)
+end_fill()
+
+up()
+goto(-400, 350)
+seth(0)
+down()
+color("black", "black")
+begin_fill()
+forward(800)
+left(150)
+circle(800, 60)
+end_fill()
 
 up()
 goto(-450, -30)
