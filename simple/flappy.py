@@ -13,7 +13,7 @@ from freegames import vector
 
 def tap(x, y):
     "Move bird up in response to screen tap."
-    up = vector(0, 30)
+    up = vector(0, 50)
     bird.move(up)
 
 
