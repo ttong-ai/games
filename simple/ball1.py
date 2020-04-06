@@ -1,5 +1,4 @@
 import tkinter as tk
-import random
 import time
 
 window = tk.Tk()
