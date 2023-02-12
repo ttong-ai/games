@@ -2,9 +2,11 @@ from abc import ABC, abstractmethod
 from math import sqrt
 import pygame
 from pygame import mixer
+import os
 from random import randint
 from typing import List
 
+path = os.path.dirname(os.path.abspath(__file__))
 
 # Initialize the pygame instance
 pygame.init()
@@ -37,7 +39,7 @@ class Entity(ABC):
     def __init__(
         self, image_name, init_x, init_y, speed, boost, dx=0, dy=0, icon_x_offset=0, icon_y_offset=0
     ):
-        self.image = pygame.image.load(image_name)
+        self.image = pygame.image.load(os.path.join(path, image_name))
         self.image_size = self.image.get_rect().size
         self.center_offset_x = self.image_size[0] // 2
         self.center_offset_y = self.image_size[1] // 2
@@ -117,7 +119,7 @@ class Enemy(Entity):
         self.status = 0
 
     def explode(self):
-        self.image = pygame.image.load("flame.png")
+        self.image = pygame.image.load(os.path.join(path, "flame.png"))
         screen.blit(self.image, (self.x, self.y))
 
 
@@ -129,13 +131,13 @@ class Spaceship(Entity):
 
     def got_hit(self, enemies: List[Enemy]):
         for e in enemies:
-            if self.distance(e) < sqrt(e.center_offset_x ** 2 + e.center_offset_y ** 2):
+            if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2):
                 self.status = 0
                 self.explode()
                 break
 
     def explode(self):
-        self.image = pygame.image.load("flame.png")
+        self.image = pygame.image.load(os.path.join(path, "flame.png"))
         screen.blit(self.image, (self.x, self.y))
 
 
@@ -153,7 +155,7 @@ class Bullet(Entity):
 
     def hit_trigger(self, enemies: List[Enemy]):
         for e in enemies:
-            if self.distance(e) < sqrt(e.center_offset_x ** 2 + e.center_offset_y ** 2):
+            if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2):
                 self.status = 0
                 self.detonate(enemies)
                 break
@@ -163,7 +165,7 @@ class Bullet(Entity):
 
     def detonate(self, enemies: List[Enemy]):
         for e in enemies:
-            if self.distance(e) < sqrt(e.center_offset_x ** 2 + e.center_offset_y ** 2) * self.range:
+            if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2) * self.range:
                 e.gets_killed()
 
 
@@ -196,7 +198,7 @@ class SuperBomb(Bullet):
 
     def detonate(self, enemies: List[Enemy]):
         super(SuperBomb, self).detonate(enemies)
-        self.image = pygame.image.load("explosion.png")
+        self.image = pygame.image.load(os.path.join(path, "explosion.png"))
         size = self.image.get_rect().size
         screen.blit(self.image, (self.x - size[0] // 2, self.y - size[1] // 2))
 
@@ -207,10 +209,10 @@ screen = pygame.display.set_mode((windowWidth, windowHeight))
 
 # Set the title and caption
 pygame.display.set_caption(" Space Invader")
-icon = pygame.image.load("spaceship.png")
+icon = pygame.image.load(os.path.join(path, "spaceship.png"))
 pygame.display.set_icon(icon)
-background = pygame.image.load("background.png")
-mixer.music.load("background.wav")
+background = pygame.image.load(os.path.join(path, "background.png"))
+mixer.music.load(os.path.join(path, "background.wav"))
 mixer.music.play(-1)
 
 player = Spaceship(init_x=windowWidth / 2, init_y=windowHeight - 100, speed=10, boost=2)
