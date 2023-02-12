@@ -15,8 +15,20 @@ window.geometry(f"{WIDTH}x{HEIGHT}")
 canvas = tk.Canvas(window, width=WIDTH, height=HEIGHT)
 canvas.pack()
 
-colors = ["red", "green", "blue", "orange", "yellow", "cyan", "magenta", "dodgerblue", "turquoise", "grey", "gold",
-          "pink"]
+colors = [
+    "red",
+    "green",
+    "blue",
+    "orange",
+    "yellow",
+    "cyan",
+    "magenta",
+    "dodgerblue",
+    "turquoise",
+    "grey",
+    "gold",
+    "pink",
+]
 
 
 class Ball:

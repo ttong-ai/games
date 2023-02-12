@@ -1,6 +1,6 @@
 import turtle
 
-turtle.setup(500,500,400,0)
+turtle.setup(500, 500, 400, 0)
 
 grace = turtle.Pen()
 

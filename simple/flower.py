@@ -22,7 +22,7 @@ for i in range(150):
     r = r + step_r
     nathan.forward(step_r)
     nathan.left(90)
-    nathan.circle(r, extent=360/n*m)
+    nathan.circle(r, extent=360 / n * m)
     nathan.right(90)
 
 turtle.exitonclick()
