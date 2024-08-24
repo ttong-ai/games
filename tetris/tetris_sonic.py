@@ -5,11 +5,13 @@ import random
 pygame.init()
 
 # Constants
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
 BLOCK_SIZE = 30
 GRID_WIDTH = 10
 GRID_HEIGHT = 20
+
+# Calculate screen dimensions based on grid size
+SCREEN_WIDTH = GRID_WIDTH * BLOCK_SIZE
+SCREEN_HEIGHT = GRID_HEIGHT * BLOCK_SIZE
 
 # Colors
 BLACK = (0, 0, 0)
@@ -30,7 +32,7 @@ SHAPES = [
     [[1, 1, 1], [1, 0, 0]],
     [[1, 1, 1], [0, 0, 1]],
     [[1, 1, 0], [0, 1, 1]],
-    [[0, 1, 1], [1, 1, 0]],
+    [[0, 1, 1], [1, 1, 0]]
 ]
 
 COLORS = [CYAN, YELLOW, MAGENTA, RED, GREEN, BLUE, ORANGE]
@@ -75,32 +77,18 @@ class TetrisGame:
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
                 if cell:
-                    pygame.draw.rect(
-                        screen,
-                        cell,
-                        (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
-                    )
-                pygame.draw.rect(
-                    screen,
-                    WHITE,
-                    (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
-                    1,
-                )
+                    pygame.draw.rect(screen, cell,
+                                     (x * BLOCK_SIZE, y * BLOCK_SIZE,
+                                      BLOCK_SIZE, BLOCK_SIZE))
 
     def draw_current_piece(self):
         for y, row in enumerate(self.current_piece.shape):
             for x, cell in enumerate(row):
                 if cell:
-                    pygame.draw.rect(
-                        screen,
-                        self.current_piece.color,
-                        (
-                            (self.current_piece.x + x) * BLOCK_SIZE,
-                            (self.current_piece.y + y) * BLOCK_SIZE,
-                            BLOCK_SIZE,
-                            BLOCK_SIZE,
-                        ),
-                    )
+                    pygame.draw.rect(screen, self.current_piece.color,
+                                     ((self.current_piece.x + x) * BLOCK_SIZE,
+                                      (self.current_piece.y + y) * BLOCK_SIZE,
+                                      BLOCK_SIZE, BLOCK_SIZE))
 
     def draw_score(self):
         font = pygame.font.Font(None, 36)
@@ -108,11 +96,7 @@ class TetrisGame:
         screen.blit(score_text, (10, 10))
 
     def move_piece(self, dx, dy):
-        if self.is_valid_move(
-            self.current_piece.x + dx,
-            self.current_piece.y + dy,
-            self.current_piece.shape,
-        ):
+        if self.is_valid_move(self.current_piece.x + dx, self.current_piece.y + dy, self.current_piece.shape):
             self.current_piece.move(dx, dy)
         elif dy > 0:
             self.lock_piece()
@@ -126,12 +110,10 @@ class TetrisGame:
         for row_y, row in enumerate(shape):
             for col_x, cell in enumerate(row):
                 if cell:
-                    if (
-                        y + row_y >= GRID_HEIGHT
-                        or x + col_x < 0
-                        or x + col_x >= GRID_WIDTH
-                        or self.grid[y + row_y][x + col_x]
-                    ):
+                    if (y + row_y >= GRID_HEIGHT or
+                            x + col_x < 0 or
+                            x + col_x >= GRID_WIDTH or
+                            self.grid[y + row_y][x + col_x]):
                         return False
         return True
 
@@ -146,13 +128,13 @@ class TetrisGame:
             self.game_over = True
 
     def clear_lines(self):
-        lines_cleared = 0
-        for y in range(GRID_HEIGHT - 1, -1, -1):
-            if all(self.grid[y]):
-                del self.grid[y]
-                self.grid.insert(0, [0 for _ in range(GRID_WIDTH)])
-                lines_cleared += 1
-        self.score += lines_cleared**2 * 100
+        lines_to_clear = [y for y in range(GRID_HEIGHT) if all(self.grid[y])]
+        for line in lines_to_clear:
+            del self.grid[line]
+            self.grid.insert(0, [0 for _ in range(GRID_WIDTH)])
+
+        lines_cleared = len(lines_to_clear)
+        self.score += lines_cleared ** 2 * 100
 
     def run(self):
         fall_time = 0
