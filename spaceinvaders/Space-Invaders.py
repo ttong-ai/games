@@ -97,6 +97,7 @@ class Entity(ABC):
     def distance(self, other):
         return sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
 
+
 class Enemy(Entity):
     def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0, value=10):
         super(Enemy, self).__init__(
@@ -124,6 +125,7 @@ class Enemy(Entity):
         self.image = pygame.image.load(os.path.join(path, "flame.png"))
         screen.blit(self.image, (self.x, self.y))
 
+
 class Spaceship(Entity):
     def __init__(self, init_x, init_y, speed, boost=1, dx=0, dy=0):
         super(Spaceship, self).__init__(
@@ -132,7 +134,7 @@ class Spaceship(Entity):
 
     def got_hit(self, enemies: List[Enemy]):
         for e in enemies:
-            if self.distance(e) < sqrt(e.center_offset_x ** 2 + e.center_offset_y ** 2):
+            if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2):
                 self.status = 0
                 self.explode()
                 break
@@ -150,7 +152,7 @@ class Bullet(Entity):
 
     def got_hit(self, enemies: List[Enemy]):
         for e in enemies:
-            if self.distance(e) < sqrt(e.center_offset_x ** 2 + e.center_offset_y ** 2):
+            if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2):
                 self.status = 0
                 self.explode()
                 break
@@ -174,7 +176,7 @@ class Bullet(Entity):
 
     def hit_trigger(self, enemies: List[Enemy]):
         for e in enemies:
-            if self.distance(e) < sqrt(e.center_offset_x ** 2 + e.center_offset_y ** 2):
+            if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2):
                 self.status = 0
                 self.detonate(enemies)
                 break
@@ -184,7 +186,7 @@ class Bullet(Entity):
 
     def detonate(self, enemies: List[Enemy]):
         for e in enemies:
-            if self.distance(e) < sqrt(e.center_offset_x ** 2 + e.center_offset_y ** 2) * self.range:
+            if self.distance(e) < sqrt(e.center_offset_x**2 + e.center_offset_y**2) * self.range:
                 e.gets_killed()
 
 
@@ -333,7 +335,6 @@ def handle_game_over(player_won):
         show_big_text("You Lost!!!", x=windowWidth / 2 - 200, y=windowHeight / 2)
     active = False
 
-# ...
 
 if len(enemies) == 0:
     handle_game_over(player_won=True)

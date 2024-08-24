@@ -1,4 +1,4 @@
 .PHONY: lint
 
 lint:
-	black . -l 110 --target-version py39
+	black . -l 110 --target-version py310
